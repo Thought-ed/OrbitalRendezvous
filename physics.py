@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
 MU = 398600.4418  # earth gravitational parameter (G * M)
 
@@ -19,7 +20,6 @@ xs = []
 ys = []
 
 
-
 # Figure Setup
 fig, ax = plt.subplots(figsize=(8, 8))
 ax.set_xlim(-10000, 10000)
@@ -30,7 +30,7 @@ ax.set_xlabel('x (km)')
 ax.set_ylabel('y (km)')
 ax.set_title('OrbitalRendezvous Simulation (But just one for now)')
 
-#Earth
+# home
 earth = plt.Circle(
     (0, 0), 
     EARTH_RADIUS, 
@@ -38,32 +38,38 @@ earth = plt.Circle(
     color='blue', 
     alpha=0.5
 )
-
 ax.add_patch(earth)
 ax.annotate(
-    "Earth",
+    "Home",
     (0, 0),
     xytext=(0, 0),
     textcoords="offset points"
 )
 
-# Orbit Trail
+# orbit Trail
 orbit_line, = ax.plot([], [], lw=1)
 
-# Satellite Marker
+# satellite Marker
 satellite_dot, = ax.plot([], [], 'ko', markersize=5)
 
 satellite_label = ax.annotate(
     "Satellite (LEO)", 
     (x, y),
-    xytext=(10, 10),
+    xytext=(5, 5),
     textcoords='offset points'
 )
 
-plt.show(block=False)
+# telemetry box
+telemetry = ax.text(
+    0.02, 0.02, '',    
+    transform=ax.transAxes, 
+    fontsize=10,
+    verticalalignment='bottom',
+    bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8)
+)
 
-for step in range (steps):
-    # calculate acceleration
+def physics_step():
+    global x, y, vx, vy
     r = np.sqrt(x*x + y*y)
     ax_grav = -MU * x / r**3
     ay_grav = -MU * y / r**3
@@ -73,13 +79,35 @@ for step in range (steps):
     y += vy * dt
     xs.append(x)
     ys.append(y)
-    
-    if step % 10 == 0:
-        orbit_line.set_data(xs, ys)
-        satellite_dot.set_data([x], [y])
-        satellite_label.xy = (x, y)
-        fig.canvas.draw_idle()
-        plt.pause(0.01)
+
+    #telemetry
+    altitude = r - EARTH_RADIUS
+    speed = np.sqrt(vx**2 + vy**2)
+    telemetry.set_text(
+        f'Altitude: {altitude:.1f} km\n'
+        f'Speed: {speed:.1f} km/s\n'
+        f'Position: ({x:.1f}, {y:.1f}) km\n'
+        f'Velocity: ({vx:.2f}, {vy:.2f}) km/s'
+    )
+
+def update(frame):
+
+    for _ in range(10):  # increase this for faster simulation
+        physics_step()
+    orbit_line.set_data(xs[-1200:], ys[-1200:])
+    satellite_dot.set_data([x], [y])
+    satellite_label.xy = (x, y)
+
+    return orbit_line, satellite_dot, satellite_label, telemetry
+
+
+ani = FuncAnimation(
+    fig,
+    update,
+    interval = 16.67,
+    frames=steps,
+    blit=True,
+    repeat=False
+)
 
 plt.show()
-
