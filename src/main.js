@@ -70,7 +70,7 @@ addText()
 const trail = []
 const MAX_TRAIL = 2500
 const trailGeometry = new THREE.BufferGeometry
-const trailMaterial = new THREE.LineBasicMaterial({ color: 0x00ffcc })
+const trailMaterial = new THREE.LineBasicMaterial({ color: 0x0073EB })
 const trailLine = new THREE.Line(trailGeometry, trailMaterial);
 scene.add(trailLine);
 
