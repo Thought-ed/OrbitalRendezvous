@@ -8,7 +8,7 @@ MU = 398600.4418  # earth gravitational parameter (G * M)
 x = 7000.0
 y = 0.0
 vx = 0.0
-vy = 7.5
+vy = 7.546  # roughly circular LEO speed at 7000 km from Earth's center
 
 # home characteristics
 EARTH_RADIUS = 6378
@@ -46,17 +46,19 @@ ax.annotate(
     textcoords="offset points"
 )
 
-# orbit Trail
+# orbit trail
 orbit_line, = ax.plot([], [], lw=1)
 
 # satellite Marker
 satellite_dot, = ax.plot([], [], 'ko', markersize=5)
 
 satellite_label = ax.annotate(
-    "Satellite (LEO)", 
+    "Lil' Sputnik :D", 
     (x, y),
     xytext=(5, 5),
-    textcoords='offset points'
+    textcoords='offset points',
+    bbox=dict(boxstyle='round', facecolor='white', alpha=0.6)
+    
 )
 
 # telemetry box
