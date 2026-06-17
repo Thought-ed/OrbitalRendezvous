@@ -5,5 +5,8 @@ export class Satellite {
 
         this.vx = vx;
         this.vy = vy;
+
+        this.angle = 0;
+        this.omega = 0;
     }  
 }

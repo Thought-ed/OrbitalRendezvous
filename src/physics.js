@@ -1,6 +1,7 @@
 import {MU, EARTH_RADIUS, SCALE} from './constants.js';
+const thrust = 0.0008
 
-export function physicsStep(state, dt) {
+export function physicsStep(state, dt, input) {
     /// LEAPFROG INTEGRATION 
 
     // compute radius
@@ -28,4 +29,5 @@ export function physicsStep(state, dt) {
     // second half-kick
     state.vx += 0.5 * ax2 * dt;
     state.vy += 0.5 * ay2 * dt;
+
 }

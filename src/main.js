@@ -5,7 +5,7 @@ import { Text } from 'troika-three-text'
 import { createScene } from './scene.js';
 import { physicsStep } from './physics.js';
 import { Satellite } from './satellite.js';
-import { MU, EARTH_RADIUS, SCALE, keys } from './constants.js';
+import { MU, EARTH_RADIUS, SCALE, input, rotspeed, thrust } from './constants.js';
 import { computeTelemetry } from './telemetry.js';
 import { TechnicolorShader } from 'three/examples/jsm/Addons.js';
 
@@ -35,6 +35,21 @@ const {
     scene,
 
 } = createScene(SCALE);
+
+window.addEventListener('keydown', (e) => {
+    if (e.key == 'w') input.w = true;
+    if (e.key == 'a') input.a = true;
+    if (e.key == 's') input.s = true;
+    if (e.key == 'd') input.d = true;
+});
+
+window.addEventListener('keyup', (e) => {
+    if (e.key == 'w') input.w = false;
+    if (e.key == 'a') input.a = false;
+    if (e.key == 's') input.s = false;
+    if (e.key == 'd') input.d = false;
+});
+
 
 // Sputnik Physics and Mesh join
 function createSatellite() {
@@ -81,7 +96,39 @@ function createOrbitalTrail() {
     scene.add(state.trailLine);
 }
 
+// Rotation and Attitude Logic
+function applyControls(state) {
+    const sat = state.satellite
+    const target = Math.atan2(sat.vy, sat.vx)
+    
+    let diff = target - sat.angle;
+    diff = Math.atan2(Math.sin(diff), Math.sin(diff))
+
+    sat.omega += diff * 0.08
+    sat.omega *= 0.9;
+    sat.angle += sat.omega
+
+    // Manual Rotation
+    if (input.a) sat.angle -= rotspeed;
+    if (input.d) sat.angle += rotspeed;
+
+    // Thrust in local frame
+       if (input.w) {
+        sat.vx += Math.cos(sat.angle) * thrust;
+        sat.vy += Math.sin(sat.angle) * thrust;
+    }
+
+    if (input.s) {
+        sat.vx -= Math.cos(sat.angle) * thrust;
+        sat.vy -= Math.sin(sat.angle) * thrust;
+    }
+}
+
 //Actually move everything around
+
+//Woah, are you actually reading all this?
+//Nice, consider yourself based
+
 function animate() {
     requestAnimationFrame(animate);
 
@@ -90,7 +137,8 @@ function animate() {
     const timescale = 3
 
     for (let i = 0; i < steps; i++) {
-        physicsStep(state.satellite, dt * timescale);
+        physicsStep(state.satellite, dt * timescale, input);
+        applyControls(state)
     }
 
     state.trail.push({ x: state.satellite.x, y: state.satellite.y });
@@ -104,6 +152,8 @@ function animate() {
         state.satellite.y * SCALE,
         0
     );
+
+    state.mesh.rotation.z = state.satellite.angle - Math.PI / 2;
 
     const positions = new Float32Array(state.trail.length * 3);
 
