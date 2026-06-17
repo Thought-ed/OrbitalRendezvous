@@ -12,13 +12,14 @@ import { TechnicolorShader } from 'three/examples/jsm/Addons.js';
 const state = {
     satellite: null,
     mesh: null,
+    text: null,
     trail: [],
     trailGeometry: null,
     trailLine: null
-
 };
-const MAX_TRAIL = 2500
 
+const MAX_TRAIL = 2500
+const dt = 0.1
 const altitudeEl = document.getElementById("altitude")
 const velocityEl = document.getElementById("velocity")
 const energyEl = document.getElementById("energy")
@@ -74,19 +75,21 @@ function createSatellite() {
 }
 // Add Sputnik Label
 function addText() {
-    const text = new Text()
-    text.text = "Lil' Sputnik :D"
-    text.fontSize = 8
+    const text = new Text();
+
+    text.text = "Lil' Sputnik :D";
+    text.fontSize = 8;
 
     text.font = './fonts/Roboto_Mono/RobotoMono-Regular.ttf';
-    text.position.set(5, 5.2, 0)
-    text.renderOrder = 999;
+
     text.material.depthTest = false;
     text.material.depthWrite = false;
 
     text.sync();
-    state.mesh.add(text)
-}
+
+    state.text = text;
+scene.add(state.text);;}
+
 // Add orbital trail
 function createOrbitalTrail() {
     state.trail = []
@@ -97,23 +100,23 @@ function createOrbitalTrail() {
 }
 
 // Rotation and Attitude Logic
-function applyControls(state) {
-    const sat = state.satellite
-    const target = Math.atan2(sat.vy, sat.vx)
-    
-    let diff = target - sat.angle;
-    diff = Math.atan2(Math.sin(diff), Math.sin(diff))
+function applyControls(state, dt) {
+    const sat = state.satellite;
 
-    sat.omega += diff * 0.08
-    sat.omega *= 0.9;
-    sat.angle += sat.omega
+    const torque = rotspeed * dt;
 
-    // Manual Rotation
-    if (input.a) sat.angle -= rotspeed;
-    if (input.d) sat.angle += rotspeed;
+    if (input.a) sat.omega += torque;
+    if (input.d) sat.omega -= torque;
 
-    // Thrust in local frame
-       if (input.w) {
+    const dampingRate = 0.8;
+    sat.omega *= Math.exp(-dampingRate * dt);
+
+    const maxOmega = 2.5;
+    sat.omega = Math.max(-maxOmega, Math.min(maxOmega, sat.omega));
+
+    sat.angle += sat.omega * dt;
+
+    if (input.w) {
         sat.vx += Math.cos(sat.angle) * thrust;
         sat.vy += Math.sin(sat.angle) * thrust;
     }
@@ -135,10 +138,11 @@ function animate() {
     const dt = 0.1;      // smaller timestep
     const steps = 10;    // 10 substeps per frame
     const timescale = 3
+    const subDt = dt * timescale;
 
     for (let i = 0; i < steps; i++) {
-        physicsStep(state.satellite, dt * timescale, input);
-        applyControls(state)
+        physicsStep(state.satellite, dt*timescale, input); 
+        applyControls(state, subDt / steps);
     }
 
     state.trail.push({ x: state.satellite.x, y: state.satellite.y });
@@ -154,6 +158,12 @@ function animate() {
     );
 
     state.mesh.rotation.z = state.satellite.angle - Math.PI / 2;
+
+    state.text.position.set(
+    state.mesh.position.x + 5,
+    state.mesh.position.y + 5.2,
+    0
+);
 
     const positions = new Float32Array(state.trail.length * 3);
 
