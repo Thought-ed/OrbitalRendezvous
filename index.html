@@ -4,14 +4,14 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>intercept-dynamics</title>
-		<script type="module" crossorigin src="/intercept-dynamics/assets/index-C7pbnDen.js"></script>
+		<script type="module" crossorigin src="/intercept-dynamics/assets/index-DvGV3GYb.js"></script>
 		<link rel="stylesheet" crossorigin href="/intercept-dynamics/assets/index-DCXaBSPT.css">
 	</head>
 
 	<body>
 		<div id="title">
 			<div class="title-main">intercept-dynamics</div>
-			<div class="title-sub">orbital simulation using physics (V0.1.2/b)</div>
+			<div class="title-sub">orbital simulation using physics (V0.1.2/c)</div>
 			<div class="title-controls">
 				wasd = attitude/thrust <br>
 				scroll = zoom <br>
@@ -23,12 +23,16 @@
 				<div class="header">View Settings (INOP)</div>
                 <div class="divider"></div>
 				<div class="row">
-					<span>Show Velocity Vector</span>
+					<span>Show force vectors</span>
 					<input type="checkbox" id="show-velocity" unchecked />
 				</div>
 				<div class="row">
-					<span>Show Orbit Path</span>
+					<span>Show craft trail</span>
 					<input type="checkbox" id="show-orbit" unchecked />
+				</div>
+				<div class="row">
+					<span>Show orbit trajectory</span>
+					<input type="checkbox" id="show-trajectory" checked />
 				</div>
 			</div>
 			<div id="telemetry" class="panel">
