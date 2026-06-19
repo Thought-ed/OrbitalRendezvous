@@ -64,17 +64,22 @@ function addText() {
 	const text = new Text();
 
 	text.text = "Lil' Sputnik :D";
-	text.fontSize = 8;
+	text.fontSize = 4;
 
 	text.font = "./fonts/Roboto_Mono/RobotoMono-Regular.ttf";
 
 	text.material.depthTest = false;
 	text.material.depthWrite = false;
 
+	text.rotation.x = -Math.PI / 2;
+
 	text.sync();
+
+	text.renderOrder = 0
 
 	state.text = text;
 	scene.add(state.text);
+	
 }
 
 // Add orbital trail
@@ -103,7 +108,7 @@ function animate() {
 		MAX_TRAIL,
 	);
 
-	updateSatelliteVisuals(state, SCALE);
+	updateSatelliteVisuals(state, SCALE, camera);
 
 	updateTelemetryUI(state.satellite);
 	renderer.render(scene, camera);

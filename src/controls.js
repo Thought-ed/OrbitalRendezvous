@@ -33,22 +33,16 @@ export function applyControls(state, dt) {
 
 	const vMag = Math.sqrt(sat.vx * sat.vx + sat.vz * sat.vz);
 
-	let dirX = 0;
-	let dirZ = 0;
+	const dirX = Math.sin(sat.angle);
+	const dirZ = Math.cos(sat.angle);
 
-	if (vMag > 1e-6) {
-		dirX = sat.vx / vMag;
-		dirZ = sat.vz / vMag;
-
-    if (input.s) {
-		sat.vx -= dirX * thrust;
-		sat.vz -= dirZ * thrust;
-	}
-	}
-	if (input.w) {
+	if (input.s) {
 		sat.vx += dirX * thrust;
 		sat.vz += dirZ * thrust;
 	}
 
-
+	if (input.w) {
+		sat.vx -= dirX * thrust;
+		sat.vz -= dirZ * thrust;
+	}
 }

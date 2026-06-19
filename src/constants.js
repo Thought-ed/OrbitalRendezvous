@@ -7,7 +7,7 @@ export const panSpeed = 0.4
 
 export const rotspeed = 0.05
 export const thrust = 0.002
-export const MAX_TRAIL = 2500
+export const MAX_TRAIL = 1000
 
 export const input = {
     w: false,

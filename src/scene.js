@@ -17,8 +17,8 @@ export function createScene(scale) {
 
 	camera.position.y = 10000 * scale;
 	camera.lookAt(0, 0, 0);
-	camera.position.x -= 65;
-	camera.position.z -= -10;
+	camera.position.x -= 50;
+	camera.position.z += -10;
 
 	const renderer = new THREE.WebGLRenderer({
 		antialias: true,
